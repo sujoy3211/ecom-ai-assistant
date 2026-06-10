@@ -1,44 +1,30 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 from groq import Groq
-from .vector_store import search_products, build_vector_store
+from .shopping_search import search_shopping
 
-# Load .env - look in multiple possible locations
-load_dotenv()  # tries current directory
-load_dotenv(os.path.join(os.path.dirname(__file__), '..', '..', '.env'))  # backend folder
-load_dotenv(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'backend', '.env'))  # absolute fallback
+load_dotenv(dotenv_path=Path(__file__).resolve().parents[2] / ".env")
 
-# Configure Groq
-api_key = os.getenv("GROQ_API_KEY")
-client = Groq(api_key=api_key)
-
-# Build vector store on startup
-build_vector_store()
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def get_ai_response(user_query: str) -> dict:
 
-    # Step 1: Search relevant products
-    results = search_products(user_query, top_k=3)
+    # Step 1: Search real products from internet
+    products = search_shopping(user_query)
 
-    # Step 2: Build context
+    # Step 2: Build context from real products
     context = ""
-    products_found = []
-
-    for i, (doc, metadata) in enumerate(zip(results["documents"][0], results["metadatas"][0])):
-        context += f"\nProduct {i+1}: {doc}\n"
-        products_found.append({
-            "name": metadata["name"],
-            "category": metadata["category"],
-            "price": f"₹{metadata['price']}"
-        })
+    for i, p in enumerate(products):
+        context += f"\nProduct {i+1}: {p['name']}, Price: {p['price']}, Store: {p['source']}\n"
 
     # Step 3: Build prompt
-    prompt = f"""You are a helpful e-commerce shopping assistant.
-Answer the customer's question ONLY based on the products listed below.
-If the answer is not in the products, say "I don't have that product available."
-Be friendly, concise, and helpful.
+    prompt = f"""You are a helpful shopping assistant.
+Based on the real products found online below, answer the customer's question.
+Be friendly, helpful and recommend the best option with reasons.
+mention prices and where to buy.
 
-Available Products:
+Real Products Found:
 {context}
 
 Customer Question: {user_query}
@@ -48,12 +34,10 @@ Answer:"""
     # Step 4: Get Groq response
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
-        messages=[
-            {"role": "user", "content": prompt}
-        ]
+        messages=[{"role": "user", "content": prompt}]
     )
 
     return {
         "answer": response.choices[0].message.content,
-        "relevant_products": products_found
+        "relevant_products": products
     }

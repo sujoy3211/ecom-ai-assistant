@@ -3,6 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 
 function ProductCard({ product, index }) {
+  const [showLinks, setShowLinks] = useState(false);
+
+  const searchQuery = encodeURIComponent(product.name);
+  const flipkartUrl = `https://www.flipkart.com/search?q=${searchQuery}`;
+  const amazonUrl = `https://www.amazon.in/s?k=${searchQuery}`;
+  const googleUrl = `https://www.google.com/search?q=${searchQuery}+buy+online+india`;
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -21,14 +28,55 @@ function ProductCard({ product, index }) {
           <p style={{ color: "#e0e7ff", fontWeight: 600, fontSize: "13px" }}>{product.name}</p>
           <p style={{ color: "#818cf8", fontSize: "11px" }}>{product.category}</p>
         </div>
-        <span style={{
-          background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-          color: "white", padding: "4px 10px",
-          borderRadius: "20px", fontSize: "12px", fontWeight: 700
-        }}>
-          {product.price}
-        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span style={{
+            background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+            color: "white", padding: "4px 10px",
+            borderRadius: "20px", fontSize: "12px", fontWeight: 700
+          }}>
+            {product.price}
+          </span>
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setShowLinks(!showLinks)}
+            style={{
+              background: "rgba(99,102,241,0.2)",
+              border: "1px solid rgba(99,102,241,0.4)",
+              borderRadius: "8px", padding: "4px 10px",
+              color: "#818cf8", cursor: "pointer", fontSize: "11px"
+            }}
+          >
+            {showLinks ? "Hide" : "Buy 🛒"}
+          </motion.button>
+        </div>
       </div>
+
+      <AnimatePresence>
+        {showLinks && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            style={{ marginTop: "10px", display: "flex", gap: "8px", flexWrap: "wrap" }}
+          >
+            <a href={flipkartUrl} target="_blank" rel="noreferrer" style={{
+              background: "#F37220", color: "white", padding: "5px 14px",
+              borderRadius: "6px", fontSize: "12px", textDecoration: "none", fontWeight: 600
+            }}>🛍️ Flipkart</a>
+
+            <a href={amazonUrl} target="_blank" rel="noreferrer" style={{
+              background: "#FF9900", color: "white", padding: "5px 14px",
+              borderRadius: "6px", fontSize: "12px", textDecoration: "none", fontWeight: 600
+            }}>📦 Amazon</a>
+
+            <a href={googleUrl} target="_blank" rel="noreferrer" style={{
+              background: "#4285F4", color: "white", padding: "5px 14px",
+              borderRadius: "6px", fontSize: "12px", textDecoration: "none", fontWeight: 600
+            }}>🔍 Google</a>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
@@ -75,7 +123,9 @@ function Message({ msg }) {
         </div>
         {msg.products && msg.products.length > 0 && (
           <div style={{ marginTop: "8px" }}>
-            {msg.products.map((p, i) => <ProductCard key={i} product={p} index={i} />)}
+            {msg.products.map((p, i) => (
+              <ProductCard key={i} product={p} index={i} />
+            ))}
           </div>
         )}
       </div>
@@ -113,7 +163,7 @@ export default function App() {
     } catch {
       setMessages(prev => [...prev, {
         role: "assistant",
-        content: "⚠️ Something went wrong. Please try again.",
+        content: "Something went wrong. Please try again.",
         products: []
       }]);
     } finally {
@@ -131,43 +181,27 @@ export default function App() {
 
   return (
     <>
-      {/* Animated Background */}
       <div style={{
         position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
         background: "#0a0a0f", zIndex: 0
       }} />
 
-      {/* Glowing Orbs */}
       {orbs.map((orb, i) => (
         <motion.div
           key={i}
-          animate={{
-            x: [0, 40, -20, 0],
-            y: [0, -50, 30, 0],
-            scale: [1, 1.2, 0.9, 1],
-          }}
-          transition={{
-            duration: orb.duration,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: i * 1.5
-          }}
+          animate={{ x: [0, 40, -20, 0], y: [0, -50, 30, 0], scale: [1, 1.2, 0.9, 1] }}
+          transition={{ duration: orb.duration, repeat: Infinity, ease: "easeInOut", delay: i * 1.5 }}
           style={{
             position: "fixed",
-            width: `${orb.size}px`,
-            height: `${orb.size}px`,
+            width: `${orb.size}px`, height: `${orb.size}px`,
             borderRadius: "50%",
             background: `radial-gradient(circle, ${orb.color}, transparent)`,
-            left: orb.left,
-            top: orb.top,
-            zIndex: 0,
-            pointerEvents: "none",
-            filter: "blur(40px)"
+            left: orb.left, top: orb.top,
+            zIndex: 0, pointerEvents: "none", filter: "blur(40px)"
           }}
         />
       ))}
 
-      {/* Grid Lines */}
       <div style={{
         position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
         backgroundImage: "linear-gradient(rgba(99,102,241,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.03) 1px, transparent 1px)",
@@ -175,21 +209,18 @@ export default function App() {
         zIndex: 0, pointerEvents: "none"
       }} />
 
-      {/* Main UI */}
       <div style={{
         position: "relative", zIndex: 1,
         display: "flex", flexDirection: "column",
         alignItems: "center", minHeight: "100vh", padding: "20px"
       }}>
 
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           style={{ textAlign: "center", marginBottom: "24px", marginTop: "30px" }}
         >
-          {/* Glowing badge */}
           <motion.div
             animate={{ opacity: [0.7, 1, 0.7] }}
             transition={{ duration: 2, repeat: Infinity }}
@@ -203,7 +234,6 @@ export default function App() {
           >
             ✨ Powered by RAG + Groq LLaMA 3.3
           </motion.div>
-
           <h1 style={{
             fontSize: "clamp(1.8rem, 5vw, 3rem)", fontWeight: 800,
             background: "linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899)",
@@ -213,11 +243,10 @@ export default function App() {
             🛒 AI Shopping Assistant
           </h1>
           <p style={{ color: "#475569", marginTop: "8px", fontSize: "14px" }}>
-            Ask me anything — I'll find the perfect product for you
+            Ask me anything — I'll find the perfect product for you!
           </p>
         </motion.div>
 
-        {/* Chat Box */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -233,7 +262,6 @@ export default function App() {
             boxShadow: "0 0 80px rgba(99,102,241,0.15), inset 0 1px 0 rgba(255,255,255,0.05)"
           }}
         >
-          {/* Chat header */}
           <div style={{
             padding: "16px 24px",
             borderBottom: "1px solid rgba(99,102,241,0.15)",
@@ -244,19 +272,16 @@ export default function App() {
               transition={{ duration: 2, repeat: Infinity }}
               style={{
                 width: "10px", height: "10px", borderRadius: "50%",
-                background: "#22c55e",
-                boxShadow: "0 0 8px #22c55e"
+                background: "#22c55e", boxShadow: "0 0 8px #22c55e"
               }}
             />
-            <span style={{ color: "#64748b", fontSize: "13px" }}>AI is online</span>
+            <span style={{ color: "#64748b", fontSize: "13px" }}>AI is online • Powered by Groq LLaMA 3.3</span>
           </div>
 
-          {/* Messages */}
           <div style={{ flex: 1, overflowY: "auto", padding: "24px" }}>
             <AnimatePresence>
               {messages.map((msg, i) => <Message key={i} msg={msg} />)}
             </AnimatePresence>
-
             {loading && (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -266,19 +291,15 @@ export default function App() {
                 <div style={{
                   width: "28px", height: "28px", borderRadius: "50%",
                   background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                  display: "flex", alignItems: "center",
-                  justifyContent: "center", fontSize: "14px"
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px"
                 }}>🤖</div>
                 <div style={{ display: "flex", gap: "4px" }}>
-                  {[0, 1, 2].map(i => (
+                  {[0, 1, 2].map(j => (
                     <motion.div
-                      key={i}
+                      key={j}
                       animate={{ y: [0, -6, 0] }}
-                      transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
-                      style={{
-                        width: "6px", height: "6px", borderRadius: "50%",
-                        background: "#6366f1"
-                      }}
+                      transition={{ duration: 0.6, repeat: Infinity, delay: j * 0.15 }}
+                      style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#6366f1" }}
                     />
                   ))}
                 </div>
@@ -287,7 +308,6 @@ export default function App() {
             <div ref={bottomRef} />
           </div>
 
-          {/* Input */}
           <div style={{
             padding: "16px 24px",
             borderTop: "1px solid rgba(99,102,241,0.15)",
@@ -299,12 +319,10 @@ export default function App() {
               onKeyDown={e => e.key === "Enter" && sendMessage()}
               placeholder="e.g. 'Best laptop under 55000' or 'wireless headphones'"
               style={{
-                flex: 1,
-                background: "rgba(255,255,255,0.04)",
+                flex: 1, background: "rgba(255,255,255,0.04)",
                 border: "1px solid rgba(99,102,241,0.25)",
                 borderRadius: "14px", padding: "13px 18px",
                 color: "white", fontSize: "14px", outline: "none",
-                transition: "border-color 0.2s"
               }}
               onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.6)"}
               onBlur={e => e.target.style.borderColor = "rgba(99,102,241,0.25)"}
@@ -328,7 +346,6 @@ export default function App() {
           </div>
         </motion.div>
 
-        {/* Footer */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
