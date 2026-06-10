@@ -1,0 +1,66 @@
+[
+  {
+    "id": "1",
+    "name": "Nike Air Max 270",
+    "category": "Shoes",
+    "price": 8999,
+    "description": "Lightweight running shoes with Air Max cushioning. Available in black, white, and red. Suitable for daily running and casual wear.",
+    "specs": "Size: 6-12 UK, Material: Mesh upper, Sole: Rubber"
+  },
+  {
+    "id": "2",
+    "name": "Samsung 65 inch 4K Smart TV",
+    "category": "Electronics",
+    "price": 54999,
+    "description": "65 inch 4K UHD Smart TV with HDR support, built-in Alexa, and 3 HDMI ports. Perfect for home theatre setup.",
+    "specs": "Resolution: 3840x2160, Refresh Rate: 60Hz, Connectivity: WiFi, Bluetooth, HDMI"
+  },
+  {
+    "id": "3",
+    "name": "boAt Rockerz 450 Headphones",
+    "category": "Audio",
+    "price": 1499,
+    "description": "Wireless Bluetooth headphones with 15 hours battery life, 40mm drivers, and foldable design. Great for music and calls.",
+    "specs": "Battery: 15hrs, Driver: 40mm, Connectivity: Bluetooth 5.0"
+  },
+  {
+    "id": "4",
+    "name": "Lenovo IdeaPad Slim 5 Laptop",
+    "category": "Laptops",
+    "price": 52999,
+    "description": "Intel Core i5 12th Gen laptop with 16GB RAM, 512GB SSD, and 15.6 inch Full HD display. Ideal for students and professionals.",
+    "specs": "Processor: i5-12th Gen, RAM: 16GB, Storage: 512GB SSD, Display: 15.6 FHD"
+  },
+  {
+    "id": "5",
+    "name": "Philips Air Fryer HD9200",
+    "category": "Kitchen",
+    "price": 6999,
+    "description": "4.1 litre air fryer with rapid air technology. Cook crispy food with 90% less fat. Easy to clean and compact design.",
+    "specs": "Capacity: 4.1L, Power: 1400W, Temperature: 80-200°C"
+  },
+  {
+    "id": "6",
+    "name": "Apple iPhone 15",
+    "category": "Smartphones",
+    "price": 79999,
+    "description": "Apple iPhone 15 with A16 Bionic chip, 48MP camera, USB-C charging, and 6.1 inch Super Retina XDR display.",
+    "specs": "Chip: A16 Bionic, Camera: 48MP, Storage: 128GB, Display: 6.1 inch OLED"
+  },
+  {
+    "id": "7",
+    "name": "Wildcraft 40L Backpack",
+    "category": "Bags",
+    "price": 1999,
+    "description": "Durable 40 litre backpack with laptop compartment, rain cover, and ergonomic shoulder straps. Perfect for trekking and travel.",
+    "specs": "Capacity: 40L, Material: Polyester, Laptop Sleeve: Yes, Rain Cover: Included"
+  },
+  {
+    "id": "8",
+    "name": "Prestige Induction Cooktop",
+    "category": "Kitchen",
+    "price": 2499,
+    "description": "2000W induction cooktop with 7 preset cooking modes, auto shut-off, and touch controls. Energy efficient and safe.",
+    "specs": "Power: 2000W, Modes: 7, Safety: Auto shut-off, Control: Touch panel"
+  }
+]
