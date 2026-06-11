@@ -3,80 +3,109 @@ import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 
 function ProductCard({ product, index }) {
-  const [showLinks, setShowLinks] = useState(false);
-
-  const searchQuery = encodeURIComponent(product.name);
-  const flipkartUrl = `https://www.flipkart.com/search?q=${searchQuery}`;
-  const amazonUrl = `https://www.amazon.in/s?k=${searchQuery}`;
-  const googleUrl = `https://www.google.com/search?q=${searchQuery}+buy+online+india`;
-
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.1 }}
+      whileHover={{ scale: 1.02 }}
       style={{
-        background: "rgba(99,102,241,0.1)",
-        border: "1px solid rgba(99,102,241,0.3)",
+        background: "rgba(99,102,241,0.08)",
+        border: "1px solid rgba(99,102,241,0.25)",
         borderRadius: "12px",
         padding: "12px",
         marginTop: "8px",
+        display: "flex",
+        gap: "12px",
+        alignItems: "center",
+        cursor: "pointer"
       }}
+      onClick={() => product.link && window.open(product.link, "_blank")}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div>
-          <p style={{ color: "#e0e7ff", fontWeight: 600, fontSize: "13px" }}>{product.name}</p>
-          <p style={{ color: "#818cf8", fontSize: "11px" }}>{product.category}</p>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+      {product.thumbnail && (
+        <img
+          src={product.thumbnail}
+          alt={product.name}
+          style={{
+            width: "65px", height: "65px",
+            objectFit: "contain", borderRadius: "8px",
+            background: "rgba(255,255,255,0.08)",
+            padding: "4px"
+          }}
+        />
+      )}
+      <div style={{ flex: 1 }}>
+        <p style={{ color: "#e0e7ff", fontWeight: 600, fontSize: "13px", marginBottom: "4px" }}>
+          {product.name?.length > 70 ? product.name.substring(0, 70) + "..." : product.name}
+        </p>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px", flexWrap: "wrap" }}>
           <span style={{
             background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-            color: "white", padding: "4px 10px",
+            color: "white", padding: "2px 10px",
             borderRadius: "20px", fontSize: "12px", fontWeight: 700
           }}>
             {product.price}
           </span>
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={() => setShowLinks(!showLinks)}
+          {product.source && (
+            <span style={{ color: "#64748b", fontSize: "11px" }}>🏪 {product.source}</span>
+          )}
+          {product.rating && (
+            <span style={{ color: "#fbbf24", fontSize: "11px" }}>⭐ {product.rating}</span>
+          )}
+          {product.reviews && (
+            <span style={{ color: "#64748b", fontSize: "11px" }}>({product.reviews} reviews)</span>
+          )}
+        </div>
+        <div style={{ display: "flex", gap: "6px" }}>
+          {product.link && (
+            
+              href={product.link}
+              target="_blank"
+              rel="noreferrer"
+              onClick={e => e.stopPropagation()}
+              style={{
+                display: "inline-block",
+                background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                color: "white", padding: "4px 12px",
+                borderRadius: "6px", fontSize: "11px",
+                textDecoration: "none", fontWeight: 600
+              }}
+            >
+              Buy Now →
+            </a>
+          )}
+          
+            href={`https://www.amazon.in/s?k=${encodeURIComponent(product.name)}`}
+            target="_blank"
+            rel="noreferrer"
+            onClick={e => e.stopPropagation()}
             style={{
-              background: "rgba(99,102,241,0.2)",
-              border: "1px solid rgba(99,102,241,0.4)",
-              borderRadius: "8px", padding: "4px 10px",
-              color: "#818cf8", cursor: "pointer", fontSize: "11px"
+              display: "inline-block",
+              background: "#FF9900",
+              color: "white", padding: "4px 12px",
+              borderRadius: "6px", fontSize: "11px",
+              textDecoration: "none", fontWeight: 600
             }}
           >
-            {showLinks ? "Hide" : "Buy 🛒"}
-          </motion.button>
+            Amazon
+          </a>
+          
+            href={`https://www.flipkart.com/search?q=${encodeURIComponent(product.name)}`}
+            target="_blank"
+            rel="noreferrer"
+            onClick={e => e.stopPropagation()}
+            style={{
+              display: "inline-block",
+              background: "#F37220",
+              color: "white", padding: "4px 12px",
+              borderRadius: "6px", fontSize: "11px",
+              textDecoration: "none", fontWeight: 600
+            }}
+          >
+            Flipkart
+          </a>
         </div>
       </div>
-
-      <AnimatePresence>
-        {showLinks && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            style={{ marginTop: "10px", display: "flex", gap: "8px", flexWrap: "wrap" }}
-          >
-            <a href={flipkartUrl} target="_blank" rel="noreferrer" style={{
-              background: "#F37220", color: "white", padding: "5px 14px",
-              borderRadius: "6px", fontSize: "12px", textDecoration: "none", fontWeight: 600
-            }}>🛍️ Flipkart</a>
-
-            <a href={amazonUrl} target="_blank" rel="noreferrer" style={{
-              background: "#FF9900", color: "white", padding: "5px 14px",
-              borderRadius: "6px", fontSize: "12px", textDecoration: "none", fontWeight: 600
-            }}>📦 Amazon</a>
-
-            <a href={googleUrl} target="_blank" rel="noreferrer" style={{
-              background: "#4285F4", color: "white", padding: "5px 14px",
-              borderRadius: "6px", fontSize: "12px", textDecoration: "none", fontWeight: 600
-            }}>🔍 Google</a>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 }
