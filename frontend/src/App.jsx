@@ -157,7 +157,7 @@ export default function App() {
     setInput("");
     setLoading(true);
     try {
-      const res = await axios.post("http://127.0.0.1:8000/api/chat", { message: input });
+      const res = await axios.post("https://ecom-ai-assistant-nf73.onrender.com/api/chat", { message: input });
       setMessages(prev => [...prev, {
         role: "assistant",
         content: res.data.answer,
