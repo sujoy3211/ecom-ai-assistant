@@ -3,8 +3,24 @@ import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 
 function ProductCard({ product, index }) {
-  const amazonLink = "https://www.amazon.in/s?k=" + encodeURIComponent(product.name);
-  const flipkartLink = "https://www.flipkart.com/search?q=" + encodeURIComponent(product.name);
+  const q = encodeURIComponent(product.name);
+  const platforms = [
+    { name: "Amazon", url: `https://www.amazon.in/s?k=${q}`, color: "#FF9900" },
+    { name: "Flipkart", url: `https://www.flipkart.com/search?q=${q}`, color: "#F37220" },
+    { name: "Meesho", url: `https://www.meesho.com/search?q=${q}`, color: "#F43397" },
+    { name: "Myntra", url: `https://www.myntra.com/${q}`, color: "#FF3F6C" },
+    { name: "Snapdeal", url: `https://www.snapdeal.com/search?keyword=${q}`, color: "#E40000" },
+    { name: "Croma", url: `https://www.croma.com/searchB?q=${q}`, color: "#146B3A" },
+    { name: "Reliance", url: `https://www.reliancedigital.in/search?q=${q}`, color: "#0066CC" },
+    { name: "Nykaa", url: `https://www.nykaa.com/search/result/?q=${q}`, color: "#FC2779" },
+    { name: "Tata Cliq", url: `https://www.tatacliq.com/search/?searchCategory=all&text=${q}`, color: "#741A8C" },
+    { name: "Ajio", url: `https://www.ajio.com/search/?text=${q}`, color: "#E65C00" },
+    { name: "JioMart", url: `https://www.jiomart.com/search/${q}`, color: "#0070BA" },
+    { name: "Google", url: `https://www.google.com/search?q=${q}+buy+online`, color: "#4285F4" },
+  ];
+
+  const [showLinks, setShowLinks] = useState(false);
+  const [wishlisted, setWishlisted] = useState(false);
 
   return (
     <motion.div
@@ -19,7 +35,7 @@ function ProductCard({ product, index }) {
         marginTop: "8px",
         display: "flex",
         gap: "12px",
-        alignItems: "center"
+        alignItems: "flex-start"
       }}
     >
       {product.thumbnail && (
@@ -29,15 +45,29 @@ function ProductCard({ product, index }) {
           style={{
             width: "65px", height: "65px",
             objectFit: "contain", borderRadius: "8px",
-            background: "rgba(255,255,255,0.08)",
-            padding: "4px"
+            background: "rgba(255,255,255,0.08)", padding: "4px",
+            flexShrink: 0
           }}
         />
       )}
       <div style={{ flex: 1 }}>
-        <p style={{ color: "#e0e7ff", fontWeight: 600, fontSize: "13px", marginBottom: "4px" }}>
-          {product.name}
-        </p>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          <p style={{ color: "#e0e7ff", fontWeight: 600, fontSize: "13px", marginBottom: "4px", flex: 1 }}>
+            {product.name}
+          </p>
+          <motion.button
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setWishlisted(!wishlisted)}
+            style={{
+              background: "none", border: "none",
+              cursor: "pointer", fontSize: "18px", marginLeft: "8px"
+            }}
+          >
+            {wishlisted ? "❤️" : "🤍"}
+          </motion.button>
+        </div>
+
         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px", flexWrap: "wrap" }}>
           <span style={{
             background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
@@ -47,38 +77,57 @@ function ProductCard({ product, index }) {
             {product.price}
           </span>
           {product.source && (
-            <span style={{ color: "#64748b", fontSize: "11px" }}>{product.source}</span>
+            <span style={{ color: "#64748b", fontSize: "11px" }}>🏪 {product.source}</span>
           )}
           {product.rating && (
             <span style={{ color: "#fbbf24", fontSize: "11px" }}>⭐ {product.rating}</span>
           )}
+          {product.reviews && (
+            <span style={{ color: "#64748b", fontSize: "11px" }}>({product.reviews} reviews)</span>
+          )}
         </div>
-        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-          <a
-            href={amazonLink}
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              background: "#FF9900", color: "white",
-              padding: "4px 12px", borderRadius: "6px",
-              fontSize: "11px", textDecoration: "none", fontWeight: 600
-            }}
-          >
-            Amazon
-          </a>
-          <a
-            href={flipkartLink}
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              background: "#F37220", color: "white",
-              padding: "4px 12px", borderRadius: "6px",
-              fontSize: "11px", textDecoration: "none", fontWeight: 600
-            }}
-          >
-            Flipkart
-          </a>
-        </div>
+
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => setShowLinks(!showLinks)}
+          style={{
+            background: "rgba(99,102,241,0.2)",
+            border: "1px solid rgba(99,102,241,0.4)",
+            borderRadius: "8px", padding: "4px 12px",
+            color: "#818cf8", cursor: "pointer",
+            fontSize: "12px", marginBottom: "8px"
+          }}
+        >
+          {showLinks ? "Hide Stores ▲" : "Buy From 12 Stores ▼"}
+        </motion.button>
+
+        <AnimatePresence>
+          {showLinks && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}
+            >
+              {platforms.map((p, i) => (
+                
+                  key={i}
+                  href={p.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    background: p.color, color: "white",
+                    padding: "4px 10px", borderRadius: "6px",
+                    fontSize: "11px", textDecoration: "none", fontWeight: 600
+                  }}
+                >
+                  {p.name}
+                </a>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );
