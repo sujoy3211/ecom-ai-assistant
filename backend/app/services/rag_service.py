@@ -28,7 +28,7 @@ def search_real_products(query: str):
                 "name": item.get("title", ""),
                 "price": item.get("price", "N/A"),
                 "source": item.get("source", ""),
-                "link": item.get("link", ""),
+                "link": item.get("link", "") or item.get("link") or "",
                 "thumbnail": item.get("thumbnail", ""),
                 "rating": str(item.get("rating", "")),
                 "reviews": str(item.get("reviews", "")),
