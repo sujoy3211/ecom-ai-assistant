@@ -3,12 +3,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 
 function ProductCard({ product, index }) {
+  const amazonLink = "https://www.amazon.in/s?k=" + encodeURIComponent(product.name);
+  const flipkartLink = "https://www.flipkart.com/search?q=" + encodeURIComponent(product.name);
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.1 }}
-      whileHover={{ scale: 1.02 }}
       style={{
         background: "rgba(99,102,241,0.08)",
         border: "1px solid rgba(99,102,241,0.25)",
@@ -17,10 +19,8 @@ function ProductCard({ product, index }) {
         marginTop: "8px",
         display: "flex",
         gap: "12px",
-        alignItems: "center",
-        cursor: "pointer"
+        alignItems: "center"
       }}
-      onClick={() => product.link && window.open(product.link, "_blank")}
     >
       {product.thumbnail && (
         <img
@@ -36,7 +36,7 @@ function ProductCard({ product, index }) {
       )}
       <div style={{ flex: 1 }}>
         <p style={{ color: "#e0e7ff", fontWeight: 600, fontSize: "13px", marginBottom: "4px" }}>
-          {product.name?.length > 70 ? product.name.substring(0, 70) + "..." : product.name}
+          {product.name}
         </p>
         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px", flexWrap: "wrap" }}>
           <span style={{
@@ -47,59 +47,33 @@ function ProductCard({ product, index }) {
             {product.price}
           </span>
           {product.source && (
-            <span style={{ color: "#64748b", fontSize: "11px" }}>🏪 {product.source}</span>
+            <span style={{ color: "#64748b", fontSize: "11px" }}>{product.source}</span>
           )}
           {product.rating && (
             <span style={{ color: "#fbbf24", fontSize: "11px" }}>⭐ {product.rating}</span>
           )}
-          {product.reviews && (
-            <span style={{ color: "#64748b", fontSize: "11px" }}>({product.reviews} reviews)</span>
-          )}
         </div>
-        <div style={{ display: "flex", gap: "6px" }}>
-          {product.link && (
-            
-              href={product.link}
-              target="_blank"
-              rel="noreferrer"
-              onClick={e => e.stopPropagation()}
-              style={{
-                display: "inline-block",
-                background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                color: "white", padding: "4px 12px",
-                borderRadius: "6px", fontSize: "11px",
-                textDecoration: "none", fontWeight: 600
-              }}
-            >
-              Buy Now →
-            </a>
-          )}
-          
-            href={`https://www.amazon.in/s?k=${encodeURIComponent(product.name)}`}
+        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+          <a
+            href={amazonLink}
             target="_blank"
             rel="noreferrer"
-            onClick={e => e.stopPropagation()}
             style={{
-              display: "inline-block",
-              background: "#FF9900",
-              color: "white", padding: "4px 12px",
-              borderRadius: "6px", fontSize: "11px",
-              textDecoration: "none", fontWeight: 600
+              background: "#FF9900", color: "white",
+              padding: "4px 12px", borderRadius: "6px",
+              fontSize: "11px", textDecoration: "none", fontWeight: 600
             }}
           >
             Amazon
           </a>
-          
-            href={`https://www.flipkart.com/search?q=${encodeURIComponent(product.name)}`}
+          <a
+            href={flipkartLink}
             target="_blank"
             rel="noreferrer"
-            onClick={e => e.stopPropagation()}
             style={{
-              display: "inline-block",
-              background: "#F37220",
-              color: "white", padding: "4px 12px",
-              borderRadius: "6px", fontSize: "11px",
-              textDecoration: "none", fontWeight: 600
+              background: "#F37220", color: "white",
+              padding: "4px 12px", borderRadius: "6px",
+              fontSize: "11px", textDecoration: "none", fontWeight: 600
             }}
           >
             Flipkart
@@ -165,7 +139,7 @@ function Message({ msg }) {
 export default function App() {
   const [messages, setMessages] = useState([{
     role: "assistant",
-    content: "👋 Hi! I'm your AI shopping assistant. Ask me anything about our products!",
+    content: "👋 Hi! I'm your AI shopping assistant. Ask me about ANY product — I'll search the internet and find the best deals for you!",
     products: []
   }]);
   const [input, setInput] = useState("");
@@ -183,7 +157,7 @@ export default function App() {
     setInput("");
     setLoading(true);
     try {
-      const res = await axios.post("https://ecom-ai-assistant-nf73.onrender.com/api/chat", { message: input });
+      const res = await axios.post("http://127.0.0.1:8000/api/chat", { message: input });
       setMessages(prev => [...prev, {
         role: "assistant",
         content: res.data.answer,
@@ -222,9 +196,9 @@ export default function App() {
           transition={{ duration: orb.duration, repeat: Infinity, ease: "easeInOut", delay: i * 1.5 }}
           style={{
             position: "fixed",
-            width: `${orb.size}px`, height: `${orb.size}px`,
+            width: orb.size + "px", height: orb.size + "px",
             borderRadius: "50%",
-            background: `radial-gradient(circle, ${orb.color}, transparent)`,
+            background: "radial-gradient(circle, " + orb.color + ", transparent)",
             left: orb.left, top: orb.top,
             zIndex: 0, pointerEvents: "none", filter: "blur(40px)"
           }}
@@ -261,7 +235,7 @@ export default function App() {
               color: "#818cf8", fontSize: "12px", marginBottom: "12px"
             }}
           >
-            ✨ Powered by RAG + Groq LLaMA 3.3
+            Searches real products from the internet
           </motion.div>
           <h1 style={{
             fontSize: "clamp(1.8rem, 5vw, 3rem)", fontWeight: 800,
@@ -269,10 +243,10 @@ export default function App() {
             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
             lineHeight: 1.2
           }}>
-            🛒 AI Shopping Assistant
+            AI Shopping Assistant
           </h1>
           <p style={{ color: "#475569", marginTop: "8px", fontSize: "14px" }}>
-            Ask me anything — I'll find the perfect product for you!
+            Ask me anything — I will find the best deals online!
           </p>
         </motion.div>
 
@@ -288,7 +262,7 @@ export default function App() {
             backdropFilter: "blur(20px)",
             display: "flex", flexDirection: "column",
             height: "62vh",
-            boxShadow: "0 0 80px rgba(99,102,241,0.15), inset 0 1px 0 rgba(255,255,255,0.05)"
+            boxShadow: "0 0 80px rgba(99,102,241,0.15)"
           }}
         >
           <div style={{
@@ -304,12 +278,14 @@ export default function App() {
                 background: "#22c55e", boxShadow: "0 0 8px #22c55e"
               }}
             />
-            <span style={{ color: "#64748b", fontSize: "13px" }}>AI is online • Powered by Groq LLaMA 3.3</span>
+            <span style={{ color: "#64748b", fontSize: "13px" }}>AI is online - Powered by Groq LLaMA 3.3</span>
           </div>
 
           <div style={{ flex: 1, overflowY: "auto", padding: "24px" }}>
             <AnimatePresence>
-              {messages.map((msg, i) => <Message key={i} msg={msg} />)}
+              {messages.map((msg, i) => (
+                <Message key={i} msg={msg} />
+              ))}
             </AnimatePresence>
             {loading && (
               <motion.div
@@ -346,7 +322,7 @@ export default function App() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === "Enter" && sendMessage()}
-              placeholder="e.g. 'Best laptop under 55000' or 'wireless headphones'"
+              placeholder="e.g. Best laptop under 55000 or wireless headphones"
               style={{
                 flex: 1, background: "rgba(255,255,255,0.04)",
                 border: "1px solid rgba(99,102,241,0.25)",
@@ -357,7 +333,7 @@ export default function App() {
               onBlur={e => e.target.style.borderColor = "rgba(99,102,241,0.25)"}
             />
             <motion.button
-              whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(99,102,241,0.5)" }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={sendMessage}
               disabled={loading}
@@ -370,7 +346,7 @@ export default function App() {
                 whiteSpace: "nowrap"
               }}
             >
-              {loading ? "..." : "Send →"}
+              {loading ? "..." : "Send"}
             </motion.button>
           </div>
         </motion.div>
@@ -381,7 +357,7 @@ export default function App() {
           transition={{ delay: 0.8 }}
           style={{ color: "#1e293b", marginTop: "20px", fontSize: "12px" }}
         >
-          Built with FastAPI • ChromaDB • Groq LLaMA 3.3 • React
+          Built with FastAPI - SerpAPI - Groq LLaMA 3.3 - React
         </motion.p>
       </div>
     </>
