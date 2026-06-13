@@ -5,22 +5,23 @@ import axios from "axios";
 function ProductCard({ product, index }) {
   const q = encodeURIComponent(product.name);
   const platforms = [
-    { name: "Amazon", url: `https://www.amazon.in/s?k=${q}`, color: "#FF9900" },
-    { name: "Flipkart", url: `https://www.flipkart.com/search?q=${q}`, color: "#F37220" },
-    { name: "Meesho", url: `https://www.meesho.com/search?q=${q}`, color: "#F43397" },
-    { name: "Myntra", url: `https://www.myntra.com/${q}`, color: "#FF3F6C" },
-    { name: "Snapdeal", url: `https://www.snapdeal.com/search?keyword=${q}`, color: "#E40000" },
-    { name: "Croma", url: `https://www.croma.com/searchB?q=${q}`, color: "#146B3A" },
-    { name: "Reliance", url: `https://www.reliancedigital.in/search?q=${q}`, color: "#0066CC" },
-    { name: "Nykaa", url: `https://www.nykaa.com/search/result/?q=${q}`, color: "#FC2779" },
-    { name: "Tata Cliq", url: `https://www.tatacliq.com/search/?searchCategory=all&text=${q}`, color: "#741A8C" },
-    { name: "Ajio", url: `https://www.ajio.com/search/?text=${q}`, color: "#E65C00" },
-    { name: "JioMart", url: `https://www.jiomart.com/search/${q}`, color: "#0070BA" },
-    { name: "Google", url: `https://www.google.com/search?q=${q}+buy+online`, color: "#4285F4" },
+    { name: "Amazon", url: "https://www.amazon.in/s?k=" + q, color: "#FF9900" },
+    { name: "Flipkart", url: "https://www.flipkart.com/search?q=" + q, color: "#F37220" },
+    { name: "Meesho", url: "https://www.meesho.com/search?q=" + q, color: "#9B2FF7" },
+    { name: "Myntra", url: "https://www.myntra.com/" + q, color: "#FF3F6C" },
+    { name: "Snapdeal", url: "https://www.snapdeal.com/search?keyword=" + q, color: "#E40000" },
+    { name: "Croma", url: "https://www.croma.com/searchB?q=" + q, color: "#1B5E20" },
+    { name: "Reliance", url: "https://www.reliancedigital.in/search?q=" + q, color: "#0066CC" },
+    { name: "Nykaa", url: "https://www.nykaa.com/search/result/?q=" + q, color: "#FC2779" },
+    { name: "Tata Cliq", url: "https://www.tatacliq.com/search/?text=" + q, color: "#8B0000" },
+    { name: "Ajio", url: "https://www.ajio.com/search/?text=" + q, color: "#FF6B35" },
+    { name: "JioMart", url: "https://www.jiomart.com/search/" + q, color: "#0F4C81" },
+    { name: "Shopsy", url: "https://shopsy.in/search?q=" + q, color: "#F5A623" },
   ];
 
-  const [showLinks, setShowLinks] = useState(false);
+  const [showAll, setShowAll] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
+  const visible = showAll ? platforms : platforms.slice(0, 4);
 
   return (
     <motion.div
@@ -28,8 +29,12 @@ function ProductCard({ product, index }) {
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.1 }}
       style={{
-        background: "rgba(99,102,241,0.08)",
-        border: "1px solid rgba(99,102,241,0.25)",
+        background: product.is_best_deal
+          ? "rgba(34,197,94,0.1)"
+          : "rgba(99,102,241,0.08)",
+        border: product.is_best_deal
+          ? "1px solid rgba(34,197,94,0.4)"
+          : "1px solid rgba(99,102,241,0.25)",
         borderRadius: "12px",
         padding: "12px",
         marginTop: "8px",
@@ -53,24 +58,36 @@ function ProductCard({ product, index }) {
       <div style={{ flex: 1 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <p style={{ color: "#e0e7ff", fontWeight: 600, fontSize: "13px", marginBottom: "4px", flex: 1 }}>
-            {product.name}
+            {product.name?.length > 60 ? product.name.substring(0, 60) + "..." : product.name}
           </p>
           <motion.button
             whileHover={{ scale: 1.2 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setWishlisted(!wishlisted)}
-            style={{
-              background: "none", border: "none",
-              cursor: "pointer", fontSize: "18px", marginLeft: "8px"
-            }}
+            style={{ background: "none", border: "none", cursor: "pointer", fontSize: "18px", marginLeft: "8px" }}
           >
             {wishlisted ? "❤️" : "🤍"}
           </motion.button>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px", flexWrap: "wrap" }}>
+        {product.is_best_deal && (
+          <div style={{
+            background: "rgba(34,197,94,0.2)",
+            border: "1px solid rgba(34,197,94,0.4)",
+            borderRadius: "6px", padding: "2px 8px",
+            display: "inline-block", marginBottom: "6px"
+          }}>
+            <span style={{ color: "#22c55e", fontSize: "11px", fontWeight: 700 }}>
+              🏆 Best Deal
+            </span>
+          </div>
+        )}
+
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px", flexWrap: "wrap" }}>
           <span style={{
-            background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+            background: product.is_best_deal
+              ? "linear-gradient(135deg, #22c55e, #16a34a)"
+              : "linear-gradient(135deg, #6366f1, #8b5cf6)",
             color: "white", padding: "2px 10px",
             borderRadius: "20px", fontSize: "12px", fontWeight: 700
           }}>
@@ -82,52 +99,59 @@ function ProductCard({ product, index }) {
           {product.rating && (
             <span style={{ color: "#fbbf24", fontSize: "11px" }}>⭐ {product.rating}</span>
           )}
-          {product.reviews && (
-            <span style={{ color: "#64748b", fontSize: "11px" }}>({product.reviews} reviews)</span>
-          )}
         </div>
 
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => setShowLinks(!showLinks)}
-          style={{
-            background: "rgba(99,102,241,0.2)",
-            border: "1px solid rgba(99,102,241,0.4)",
-            borderRadius: "8px", padding: "4px 12px",
-            color: "#818cf8", cursor: "pointer",
-            fontSize: "12px", marginBottom: "8px"
-          }}
-        >
-          {showLinks ? "Hide Stores ▲" : "Buy From 12 Stores ▼"}
-        </motion.button>
+        {/* Direct store link if available */}
+        {product.link && (
+          
+            href={product.link}
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              display: "inline-block",
+              background: product.is_best_deal
+                ? "linear-gradient(135deg, #22c55e, #16a34a)"
+                : "linear-gradient(135deg, #6366f1, #8b5cf6)",
+              color: "white", padding: "4px 12px",
+              borderRadius: "6px", fontSize: "11px",
+              textDecoration: "none", fontWeight: 600,
+              marginBottom: "8px"
+            }}
+          >
+            Buy on {product.source} →
+          </a>
+        )}
 
-        <AnimatePresence>
-          {showLinks && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}
+        {/* Platform Links */}
+        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+          {visible.map((p, i) => (
+            
+              key={i}
+              href={p.url}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                background: p.color, color: "white",
+                padding: "3px 10px", borderRadius: "6px",
+                fontSize: "10px", textDecoration: "none", fontWeight: 600
+              }}
             >
-              {platforms.map((p, i) => (
-                
-                  key={i}
-                  href={p.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    background: p.color, color: "white",
-                    padding: "4px 10px", borderRadius: "6px",
-                    fontSize: "11px", textDecoration: "none", fontWeight: 600
-                  }}
-                >
-                  {p.name}
-                </a>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
+              {p.name}
+            </a>
+          ))}
+          <button
+            onClick={() => setShowAll(!showAll)}
+            style={{
+              background: "rgba(99,102,241,0.2)",
+              border: "1px solid rgba(99,102,241,0.4)",
+              color: "#818cf8", padding: "3px 10px",
+              borderRadius: "6px", fontSize: "10px",
+              cursor: "pointer", fontWeight: 600
+            }}
+          >
+            {showAll ? "Less" : "More +"}
+          </button>
+        </div>
       </div>
     </motion.div>
   );
