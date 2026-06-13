@@ -49,14 +49,34 @@ def get_ai_response(user_query: str) -> dict:
         context += f"\nProduct {i+1}: {p['name']}, Price: {p['price']}, Store: {p['source']}\n"
 
     if products:
-        prompt = f"""You are a helpful AI shopping assistant.
-Based on these real products found online, answer the customer's question.
-Mention product names and prices. Be friendly and concise.
+       prompt = f"""You are a smart AI shopping assistant that helps users save money.
+
+Based on these real products found online, do the following:
+1. List each product with its price and store
+2. Compare prices across stores
+3. Identify the BEST DEAL with reasons (lowest price, offers, ratings)
+4. Give a DEAL SCORE out of 10 based on price, rating and reviews
+5. Give a smart BUY RECOMMENDATION
+
+Format your response like this:
+🏪 Products Found:
+[list products with prices]
+
+💰 Price Comparison:
+[compare prices]
+
+⭐ Best Deal: [store name] at [price]
+Reason: [why this is the best deal]
+
+🎯 Deal Score: [X/10]
+
+✅ Buy Recommendation: [your recommendation]
 
 Real Products Found:
 {context}
 
 Customer Question: {user_query}
+
 
 Answer:"""
     else:
