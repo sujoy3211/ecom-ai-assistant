@@ -199,15 +199,25 @@ export default function App() {
 
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
-    const userMsg = { role: "user", content: input };
+    
+    const userMsg = { role: "user", content: input, products: [] };
+    const currentInput = input;
+    
+    // Build history BEFORE adding new message
+    const currentHistory = messages.slice(-6).map(m => ({ 
+      role: m.role, 
+      content: m.content 
+    }));
+    
     setMessages(prev => [...prev, userMsg]);
     setInput("");
     setLoading(true);
+    
     try {
       const res = await axios.post("https://ecom-ai-assistant-nf73.onrender.com/api/chat", {
-  message: input,
-  history: messages.slice(-6).map(m => ({ role: m.role, content: m.content }))
-});
+        message: currentInput,
+        history: currentHistory
+      });
       setMessages(prev => [...prev, {
         role: "assistant",
         content: res.data.answer,
