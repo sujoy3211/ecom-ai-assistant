@@ -29,18 +29,10 @@ function ProductCard({ product, index }) {
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.1 }}
       style={{
-        background: product.is_best_deal
-          ? "rgba(34,197,94,0.1)"
-          : "rgba(99,102,241,0.08)",
-        border: product.is_best_deal
-          ? "1px solid rgba(34,197,94,0.4)"
-          : "1px solid rgba(99,102,241,0.25)",
-        borderRadius: "12px",
-        padding: "12px",
-        marginTop: "8px",
-        display: "flex",
-        gap: "12px",
-        alignItems: "flex-start"
+        background: product.is_best_deal ? "rgba(34,197,94,0.1)" : "rgba(99,102,241,0.08)",
+        border: product.is_best_deal ? "1px solid rgba(34,197,94,0.4)" : "1px solid rgba(99,102,241,0.25)",
+        borderRadius: "12px", padding: "12px", marginTop: "8px",
+        display: "flex", gap: "12px", alignItems: "flex-start"
       }}
     >
       {product.thumbnail && (
@@ -48,10 +40,9 @@ function ProductCard({ product, index }) {
           src={product.thumbnail}
           alt={product.name}
           style={{
-            width: "65px", height: "65px",
-            objectFit: "contain", borderRadius: "8px",
-            background: "rgba(255,255,255,0.08)", padding: "4px",
-            flexShrink: 0
+            width: "65px", height: "65px", objectFit: "contain",
+            borderRadius: "8px", background: "rgba(255,255,255,0.08)",
+            padding: "4px", flexShrink: 0
           }}
         />
       )}
@@ -72,60 +63,44 @@ function ProductCard({ product, index }) {
 
         {product.is_best_deal && (
           <div style={{
-            background: "rgba(34,197,94,0.2)",
-            border: "1px solid rgba(34,197,94,0.4)",
-            borderRadius: "6px", padding: "2px 8px",
-            display: "inline-block", marginBottom: "6px"
+            background: "rgba(34,197,94,0.2)", border: "1px solid rgba(34,197,94,0.4)",
+            borderRadius: "6px", padding: "2px 8px", display: "inline-block", marginBottom: "6px"
           }}>
-            <span style={{ color: "#22c55e", fontSize: "11px", fontWeight: 700 }}>
-              🏆 Best Deal
-            </span>
+            <span style={{ color: "#22c55e", fontSize: "11px", fontWeight: 700 }}>🏆 Best Deal</span>
           </div>
         )}
 
         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px", flexWrap: "wrap" }}>
           <span style={{
-            background: product.is_best_deal
-              ? "linear-gradient(135deg, #22c55e, #16a34a)"
-              : "linear-gradient(135deg, #6366f1, #8b5cf6)",
-            color: "white", padding: "2px 10px",
-            borderRadius: "20px", fontSize: "12px", fontWeight: 700
+            background: product.is_best_deal ? "linear-gradient(135deg, #22c55e, #16a34a)" : "linear-gradient(135deg, #6366f1, #8b5cf6)",
+            color: "white", padding: "2px 10px", borderRadius: "20px", fontSize: "12px", fontWeight: 700
           }}>
             {product.price}
           </span>
-          {product.source && (
-            <span style={{ color: "#64748b", fontSize: "11px" }}>🏪 {product.source}</span>
-          )}
-          {product.rating && (
-            <span style={{ color: "#fbbf24", fontSize: "11px" }}>⭐ {product.rating}</span>
-          )}
+          {product.source && <span style={{ color: "#64748b", fontSize: "11px" }}>🏪 {product.source}</span>}
+          {product.rating && <span style={{ color: "#fbbf24", fontSize: "11px" }}>⭐ {product.rating}</span>}
         </div>
 
-        {/* Direct store link if available */}
         {product.link && (
-          
+          <a
             href={product.link}
             target="_blank"
             rel="noreferrer"
             style={{
               display: "inline-block",
-              background: product.is_best_deal
-                ? "linear-gradient(135deg, #22c55e, #16a34a)"
-                : "linear-gradient(135deg, #6366f1, #8b5cf6)",
-              color: "white", padding: "4px 12px",
-              borderRadius: "6px", fontSize: "11px",
-              textDecoration: "none", fontWeight: 600,
-              marginBottom: "8px"
+              background: product.is_best_deal ? "linear-gradient(135deg, #22c55e, #16a34a)" : "linear-gradient(135deg, #6366f1, #8b5cf6)",
+              color: "white", padding: "5px 14px", borderRadius: "6px",
+              fontSize: "12px", textDecoration: "none", fontWeight: 700,
+              marginBottom: "8px", marginRight: "6px"
             }}
           >
             Buy on {product.source} →
           </a>
         )}
 
-        {/* Platform Links */}
         <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
           {visible.map((p, i) => (
-            
+            <a
               key={i}
               href={p.url}
               target="_blank"
@@ -142,11 +117,9 @@ function ProductCard({ product, index }) {
           <button
             onClick={() => setShowAll(!showAll)}
             style={{
-              background: "rgba(99,102,241,0.2)",
-              border: "1px solid rgba(99,102,241,0.4)",
-              color: "#818cf8", padding: "3px 10px",
-              borderRadius: "6px", fontSize: "10px",
-              cursor: "pointer", fontWeight: 600
+              background: "rgba(99,102,241,0.2)", border: "1px solid rgba(99,102,241,0.4)",
+              color: "#818cf8", padding: "3px 10px", borderRadius: "6px",
+              fontSize: "10px", cursor: "pointer", fontWeight: 600
             }}
           >
             {showAll ? "Less" : "More +"}
@@ -156,6 +129,7 @@ function ProductCard({ product, index }) {
     </motion.div>
   );
 }
+
 
 function Message({ msg }) {
   const isUser = msg.role === "user";
