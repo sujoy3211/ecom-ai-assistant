@@ -158,40 +158,46 @@ def get_ai_response(user_query: str, history: list = []) -> dict:
         if result:
             return result
 
-    # Detect follow-up queries (not a product search)
-    followup_keywords = ["more detail", "explain", "tell me more", "elaborate", "what about", 
-                        "why", "how", "which one should", "recommend", "suggest", "difference",
-                        "better", "worse", "pros", "cons", "advantage", "disadvantage"]
-    is_followup = any(kw in user_query.lower() for kw in followup_keywords) and len(history) > 0
+    # Detect follow-up queries
+    short_query = len(user_query.split()) < 6
+    followup_keywords = [
+        "more detail", "explain", "tell me more", "elaborate",
+        "what about", "why", "how about", "which one should",
+        "recommend", "suggest", "should i", "what do you think",
+        "more info", "camera", "battery", "performance", "display",
+        "storage", "which is better", "tell me about", "pros", "cons"
+    ]
+    is_followup = (
+        len(history) > 0 and
+        (short_query or any(kw in user_query.lower() for kw in followup_keywords)) and
+        not any(word in user_query.lower() for word in ["buy", "price", "cost", "cheap", "search", "find"])
+    )
 
     products = []
     context = ""
 
     if not is_followup:
-        # Search products only for new queries
         products = search_real_products(user_query)
         for i, p in enumerate(products):
             context += f"\nProduct {i+1}: {p['name']}, Price: {p['price']}, Store: {p['source']}, Rating: {p['rating']}\n"
 
-    # Build conversation history for Groq
+    # Build messages with history
     messages = [
         {
             "role": "system",
             "content": """You are a smart AI shopping assistant like ChatGPT that helps users in India save money.
-You remember the conversation context and give detailed, helpful answers.
-When asked for more details, elaborate on the previous answer.
+You remember the conversation context and give detailed helpful answers.
+When asked for more details, elaborate on the previous answer without searching new products.
 Always be helpful, use emojis, and provide actionable advice."""
         }
     ]
 
-    # Add conversation history
-    for msg in history[-6:]:  # last 6 messages for context
+    for msg in history[-6:]:
         messages.append({
             "role": msg.role,
             "content": msg.content
         })
 
-    # Build current message
     if context:
         current_message = f"""Based on these real products found online:
 {context}
@@ -199,11 +205,11 @@ Always be helpful, use emojis, and provide actionable advice."""
 User Question: {user_query}
 
 Provide:
-1. Direct answer to the question
+1. Direct answer
 2. Price comparison if relevant
 3. Best deal recommendation
 4. Deal score out of 10
-Use emojis and be concise but helpful."""
+Use emojis and be helpful."""
     else:
         current_message = user_query
 
