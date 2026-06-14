@@ -1,11 +1,17 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+from typing import List, Optional
 from app.services.rag_service import get_ai_response
 
 router = APIRouter()
 
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
 class ChatRequest(BaseModel):
     message: str
+    history: List[ChatMessage] = []
 
 class ChatResponse(BaseModel):
     answer: str
@@ -16,7 +22,7 @@ class ChatResponse(BaseModel):
 async def chat(request: ChatRequest):
     if not request.message.strip():
         raise HTTPException(status_code=400, detail="Message cannot be empty")
-    result = get_ai_response(request.message)
+    result = get_ai_response(request.message, request.history)
     return ChatResponse(
         answer=result["answer"],
         relevant_products=result["relevant_products"],

@@ -204,7 +204,10 @@ export default function App() {
     setInput("");
     setLoading(true);
     try {
-      const res = await axios.post("https://ecom-ai-assistant-nf73.onrender.com/api/chat", { message: input });
+      const res = await axios.post("https://ecom-ai-assistant-nf73.onrender.com/api/chat", {
+  message: input,
+  history: messages.slice(-6).map(m => ({ role: m.role, content: m.content }))
+});
       setMessages(prev => [...prev, {
         role: "assistant",
         content: res.data.answer,

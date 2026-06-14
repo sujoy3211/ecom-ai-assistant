@@ -148,7 +148,7 @@ Be specific, helpful and use emojis. Keep it concise."""
         "is_comparison": True
     }
 
-def get_ai_response(user_query: str) -> dict:
+def get_ai_response(user_query: str, history: list = []) -> dict:
     # Detect comparison query
     comparison_keywords = ["vs", "versus", "compare", "difference between", "which is better", "which one"]
     is_comparison = any(kw in user_query.lower() for kw in comparison_keywords)
@@ -158,43 +158,63 @@ def get_ai_response(user_query: str) -> dict:
         if result:
             return result
 
-    products = search_real_products(user_query)
+    # Detect follow-up queries (not a product search)
+    followup_keywords = ["more detail", "explain", "tell me more", "elaborate", "what about", 
+                        "why", "how", "which one should", "recommend", "suggest", "difference",
+                        "better", "worse", "pros", "cons", "advantage", "disadvantage"]
+    is_followup = any(kw in user_query.lower() for kw in followup_keywords) and len(history) > 0
 
+    products = []
     context = ""
-    for i, p in enumerate(products):
-        context += f"\nProduct {i+1}: {p['name']}, Price: {p['price']}, Store: {p['source']}, Rating: {p['rating']}\n"
 
-    best_deal = get_best_deal(products)
-    best_deal_text = ""
-    if best_deal:
-        best_deal_text = f"\nBest Deal Found: {best_deal['name']} at {best_deal['price']} on {best_deal['source']}"
+    if not is_followup:
+        # Search products only for new queries
+        products = search_real_products(user_query)
+        for i, p in enumerate(products):
+            context += f"\nProduct {i+1}: {p['name']}, Price: {p['price']}, Store: {p['source']}, Rating: {p['rating']}\n"
 
-    if products:
-        prompt = f"""You are a smart AI shopping assistant that helps users save money in India.
+    # Build conversation history for Groq
+    messages = [
+        {
+            "role": "system",
+            "content": """You are a smart AI shopping assistant like ChatGPT that helps users in India save money.
+You remember the conversation context and give detailed, helpful answers.
+When asked for more details, elaborate on the previous answer.
+Always be helpful, use emojis, and provide actionable advice."""
+        }
+    ]
 
-Based on real products found online, provide:
-1. Brief answer to the question
-2. Price comparison across stores
-3. Best deal recommendation with reason
-4. Deal score out of 10
-{best_deal_text}
+    # Add conversation history
+    for msg in history[-6:]:  # last 6 messages for context
+        messages.append({
+            "role": msg.role,
+            "content": msg.content
+        })
 
-Real Products Found:
+    # Build current message
+    if context:
+        current_message = f"""Based on these real products found online:
 {context}
 
-Customer Question: {user_query}
+User Question: {user_query}
 
-Keep response concise and helpful. Use emojis."""
+Provide:
+1. Direct answer to the question
+2. Price comparison if relevant
+3. Best deal recommendation
+4. Deal score out of 10
+Use emojis and be concise but helpful."""
     else:
-        prompt = f"""You are a helpful AI shopping assistant.
-Answer this shopping question helpfully.
-Customer Question: {user_query}
-Answer:"""
+        current_message = user_query
+
+    messages.append({"role": "user", "content": current_message})
 
     response = groq_client.chat.completions.create(
         model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}]
+        messages=messages
     )
+
+    best_deal = get_best_deal(products) if products else None
 
     sorted_products = sorted(
         [p for p in products if p["price_value"] > 0],
